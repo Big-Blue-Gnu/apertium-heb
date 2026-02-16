@@ -1,12 +1,53 @@
-# Firstly, we need to define what tags should be considered sentence delimiters. For this example, only full stop is set as delimiter.
-DELIMITERS = "<.>" ;
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+DELIMITERS = "<.>" "<..>" "<...>" "<!>" "<?>" "<¶>" ;
+SOFT-DELIMITERS = "<,>" ;
 
 # We can define sets for common tag clusters
-LIST Case = (n s) (n p) ; # A set that matches either a Noun Singular or a Noun Plural
+LIST Case = (n sg) | (n pl) ; # A set that matches either a Noun Singular or a Noun Plural
+LIST N = n ;
+LIST V = vblex, vaux ;
+LIST Vblex = vblex ;
+LIST Vaux = vaux;
+LIST Adj = adj ;
+LIST Adv = adv ;
+LIST Qst = qst ;
+LIST Det = det ;
+LIST Prn = prn ;
+LIST Pr = pr ;
+LIST Ij = ij ;
+LIST Cnjcoo = cnjcoo ;
+SET Imp = (vblex imp) ;
+SET Inf = (vblex inf) | (vaux inf) ;
+
+LIST M = m ;
+LIST F = f ;
+LIST Mf = mf ;
+
+LIST Sg = sg ;
+LIST Pl = pl ;
+
+LIST P1 = p1 ;
+LIST P2 = p2 ;
+LIST P3 = p3 ;
 
 SECTION
+
+SELECT Det IF (0 Det) (0 Prn) (-1 N)
+
 # If there is a singular noun to the right, I cannot be a verb or noun.
-REMOVE (n) OR (v) IF (1 (n s)) ;
+REMOVE (N) OR (V) IF (1 (n sg)) ;
 
 # If there is a conjunction followed by a certain cohort of the same CASE as me, choose me.
 SELECT $$Case IF (1 (cnjcoo) LINK 1C $$Case) ;
@@ -17,4 +58,3 @@ SELECT $$Case IF (1 (cnjcoo) LINK 1C $$Case) ;
 # http://kevindonnelly.org.uk/2010/05/constraint-grammar-tutorial/
 # https://wiki.apertium.org/wiki/Constraint_Grammar
 # https://wiki.apertium.org/wiki/Apertium_and_Constraint_Grammar
-
