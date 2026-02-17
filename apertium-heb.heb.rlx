@@ -1,53 +1,45 @@
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
-#
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
-#
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 DELIMITERS = "<.>" "<..>" "<...>" "<!>" "<?>" "<¶>" ;
 SOFT-DELIMITERS = "<,>" ;
 
 # We can define sets for common tag clusters
-LIST Case = (n sg) | (n pl) ; # A set that matches either a Noun Singular or a Noun Plural
+LIST Case = (n sg) (n pl) ; # A set that matches either a Noun Singular or a Noun Plural
 LIST N = n ;
 LIST V = vblex, vaux ;
 LIST Vblex = vblex ;
 LIST Vaux = vaux;
-LIST Adj = adj ;
-LIST Adv = adv ;
-LIST Qst = qst ;
 LIST Det = det ;
 LIST Prn = prn ;
-LIST Pr = pr ;
-LIST Ij = ij ;
-LIST Cnjcoo = cnjcoo ;
 SET Imp = (vblex imp) ;
-SET Inf = (vblex inf) | (vaux inf) ;
+SET Fut = (vblex fut) | (vaux fut) ;
+SET Past = (vblex past) | (vaux past) ;
+SET Pres = (vblex pres) | (vblex pres) ;
 
 LIST M = m ;
 LIST F = f ;
-LIST Mf = mf ;
 
 LIST Sg = sg ;
 LIST Pl = pl ;
 
 LIST P1 = p1 ;
-LIST P2 = p2 ;
-LIST P3 = p3 ;
 
 SECTION
 
-SELECT Det IF (0 Det) (0 Prn) (-1 N)
+SELECT Prn IF (0 Det) (0 Prn) (1 N) ;
+# Example (this): This [is a] cow.
+
+SELECT Prn IF (0 Det) (0 Prn) (-1 N) (1 N) ;
+
+# Verbs with person number: P1
+SELECT P1 IF (0C Fut) (0C Past) (-1 (prn subj p1 sg)) ;
+
+# Verbs with singular nouns or pronouns
+SELECT Pl IF (0C Fut) (0C Imp) (0C Past) (0C Pres) (-1 (n subj sg) | (prn subj sg)) ;
+
+# Verbs with plural nouns or pronouns
+SELECT Pl IF (0C Fut) (0C Imp) (0C Past) (0C Pres) (-1 (n subj pl) | (prn subj pl)) ;
 
 # If there is a singular noun to the right, I cannot be a verb or noun.
-REMOVE (N) OR (V) IF (1 (n sg)) ;
+REMOVE N OR V IF (1 (n sg)) ;
 
 # If there is a conjunction followed by a certain cohort of the same CASE as me, choose me.
 SELECT $$Case IF (1 (cnjcoo) LINK 1C $$Case) ;
